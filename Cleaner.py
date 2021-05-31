@@ -16,8 +16,26 @@ while True:
     if (msg_results.get('nextPageToken') != None):
         nextPageToken = msg_results['nextPageToken']
         #result_size = msg_results.get('resultSizeEstimate')
-        total_msg += result_size
-        print(f'{result_size} in this call.')
+        #total_msg += result_size
+        #print(f'{result_size} in this call.')
+        msg = msg_results.get ('messages')
+        for i in msg:
+            #pprint(i.get('id'))
+            a_message = service.users().messages().get(userId='me', id=i.get('id')).execute()
+            #pprint(a_message.get('id'))
+            #pprint(a_message.get('snippet'))
+            t = a_message['snippet']
+            #pprint((t)[:40])
+#
+            if t.find('Recognized') != -1:
+                iden = a_message.get ('id')
+                print(f"MessageID: {iden}, {t[:40]} Matched, and Deleted!")
+                service.users().messages().delete(userId='me', id=iden).execute()
+#
+            else:
+                pass
+                #print ('Not Matched!')
+
 
     elif(msg_results.get('nextPageToken') is None):
         result_size = msg_results.get('resultSizeEstimate')
@@ -25,20 +43,21 @@ while True:
         print(f'{result_size} messages found in this call.')
         msg = msg_results.get('messages')
         for i in msg:
-            #pprint(i.get('id'))
+            pprint(i.get('id'))
             a_message = service.users().messages().get(userId='me', id=i.get('id')).execute()
             #pprint(a_message.get('id'))
             #pprint(a_message.get('snippet'))
             t = a_message['snippet']
-
-            if t.find('Forwarded message') != -1:
-
+            #pprint((t)[:20])
+            if t.find('Recognized') != -1:
+#
                 iden = a_message.get ('id')
-                print(f"MessageID: {iden} Matched, and Deleted!")
+                print(f"MessageID: {iden}, {(t)[:40]} | Matched, and Deleted!")
                 service.users().messages().delete(userId='me', id=iden).execute()
-
+#
             else:
-                print('Not Matched!')
+                pass
+                #print('Not Matched!')
         break
     else:
         break
